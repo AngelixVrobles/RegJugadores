@@ -2,7 +2,9 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
-    id("kotlin-kapt") // para Room
+
+    // Necesario para usar Room (procesador de anotaciones)
+    id("kotlin-kapt")
 }
 
 android {
@@ -11,7 +13,7 @@ android {
 
     defaultConfig {
         applicationId = "com.example.regjugadores"
-        minSdk = 21
+        minSdk = 26 // 👈 ya corregido para soportar adaptive icons
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
@@ -37,28 +39,37 @@ android {
     kotlinOptions { jvmTarget = "17" }
 
     buildFeatures { compose = true }
+
     composeOptions { kotlinCompilerExtensionVersion = "1.5.4" }
-    packaging { resources { excludes += "/META-INF/{AL2.0,LGPL2.1}" } }
+
+    packaging {
+        resources {
+            excludes += "/META-INF/{AL2.0,LGPL2.1}"
+        }
+    }
 }
 
 dependencies {
-    // Room
+    // ✅ Room
     implementation("androidx.room:room-runtime:2.6.1")
     implementation("androidx.room:room-ktx:2.6.1")
     "kapt"("androidx.room:room-compiler:2.6.1")
 
-    // Lifecycle + ViewModel
+    // ✅ Lifecycle + ViewModel
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.2")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.2")
 
-    // Jetpack Compose
+    // ✅ Jetpack Compose
     implementation("androidx.activity:activity-compose:1.8.2")
     implementation("androidx.compose.ui:ui:1.6.0")
     implementation("androidx.compose.material3:material3:1.2.0")
     implementation("androidx.compose.ui:ui-tooling-preview:1.6.0")
     debugImplementation("androidx.compose.ui:ui-tooling:1.6.0")
 
-    // Tests
+    // ✅ LiveData + Compose integration (para observeAsState)
+    implementation("androidx.compose.runtime:runtime-livedata:1.6.0")
+
+    // ✅ Tests
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
