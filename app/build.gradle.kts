@@ -3,8 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
 
-    // Necesario para usar Room (procesador de anotaciones)
-    id("kotlin-kapt")
+    alias(libs.plugins.kotlin.ksp)
 }
 
 android {
@@ -13,13 +12,15 @@ android {
 
     defaultConfig {
         applicationId = "com.example.regjugadores"
-        minSdk = 26 // 👈 ya corregido para soportar adaptive icons
+        minSdk = 26
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        vectorDrawables { useSupportLibrary = true }
+        vectorDrawables {
+            useSupportLibrary = true
+        }
     }
 
     buildTypes {
@@ -36,11 +37,17 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
-    kotlinOptions { jvmTarget = "17" }
+    kotlinOptions {
+        jvmTarget = "17"
+    }
 
-    buildFeatures { compose = true }
+    buildFeatures {
+        compose = true
+    }
 
-    composeOptions { kotlinCompilerExtensionVersion = "1.5.4" }
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.5.4"
+    }
 
     packaging {
         resources {
@@ -50,14 +57,17 @@ android {
 }
 
 dependencies {
-    // ✅ Room
+    // ✅ Room (Base de datos local)
     implementation("androidx.room:room-runtime:2.6.1")
     implementation("androidx.room:room-ktx:2.6.1")
-    "kapt"("androidx.room:room-compiler:2.6.1")
+    ksp(libs.androidx.room.compiler)
 
     // ✅ Lifecycle + ViewModel
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.2")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.2")
+
+    // ✅ Navigation Compose
+    implementation("androidx.navigation:navigation-compose:2.7.6")
 
     // ✅ Jetpack Compose
     implementation("androidx.activity:activity-compose:1.8.2")
@@ -66,7 +76,7 @@ dependencies {
     implementation("androidx.compose.ui:ui-tooling-preview:1.6.0")
     debugImplementation("androidx.compose.ui:ui-tooling:1.6.0")
 
-    // ✅ LiveData + Compose integration (para observeAsState)
+    // ✅ LiveData + Compose integration (si usas observeAsState en algún lado)
     implementation("androidx.compose.runtime:runtime-livedata:1.6.0")
 
     // ✅ Tests
