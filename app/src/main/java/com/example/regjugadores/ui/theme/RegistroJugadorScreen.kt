@@ -2,9 +2,6 @@ package com.example.regjugadores.ui
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -12,20 +9,28 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.Alignment
-import androidx.compose.runtime.livedata.observeAsState
 import com.example.regjugadores.data.local.Jugador
 
 @Composable
-fun RegistroJugadorScreen(viewModel: JugadorViewModel) {
+fun RegistroJugadorScreen(
+    viewModel: JugadorViewModel,
+    jugadorId: Int,
+    onGuardar: () -> Unit
+) {
     var nombre by remember { mutableStateOf("") }
     var partidas by remember { mutableStateOf("") }
 
-    // ✅ Cargar jugadores apenas se abre la pantalla
-    LaunchedEffect(Unit) {
-        viewModel.cargarJugadores()
+    // ✅ Si es edición, cargamos datos del jugador
+    LaunchedEffect(jugadorId) {
+        if (jugadorId != -1) {
+            val jugador = viewModel.jugadores.value.find { it.jugadorId == jugadorId }
+            jugador?.let {
+                nombre = it.nombreJugador
+                partidas = it.partidasJugadas.toString()
+                viewModel.setJugadorEditando(it)
+            }
+        }
     }
-
-    val jugadores: List<Jugador> by viewModel.jugadores.observeAsState(emptyList())
 
     Column(
         modifier = Modifier
@@ -34,7 +39,7 @@ fun RegistroJugadorScreen(viewModel: JugadorViewModel) {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = "Registro de Jugadores",
+            text = if (jugadorId == -1) "Registrar Jugador" else "Editar Jugador",
             fontSize = 24.sp,
             style = MaterialTheme.typography.titleLarge,
             modifier = Modifier.padding(bottom = 24.dp)
@@ -63,60 +68,12 @@ fun RegistroJugadorScreen(viewModel: JugadorViewModel) {
             onClick = {
                 if (nombre.isNotBlank() && partidas.isNotEmpty()) {
                     viewModel.registrarJugador(nombre.trim(), partidas.toInt())
-                    nombre = ""
-                    partidas = ""
+                    onGuardar() // 🔙 volver a la lista
                 }
             },
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text(if (viewModel.estaEditando()) "Editar jugador" else "Registrar jugador")
-        }
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        Text(
-            text = "Jugadores Registrados:",
-            fontSize = 20.sp,
-            modifier = Modifier
-                .align(Alignment.Start)
-                .padding(bottom = 8.dp)
-        )
-
-        jugadores.forEach { jugador ->
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 4.dp),
-                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-            ) {
-                Row(
-                    modifier = Modifier
-                        .padding(12.dp)
-                        .fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Column {
-                        Text(jugador.nombres, style = MaterialTheme.typography.titleMedium)
-                        Text("${jugador.partidas} partidas", style = MaterialTheme.typography.bodyMedium)
-                    }
-
-                    Row {
-                        // Botón Editar
-                        IconButton(onClick = {
-                            nombre = jugador.nombres
-                            partidas = jugador.partidas.toString()
-                            viewModel.setJugadorEditando(jugador)
-                        }) {
-                            Icon(Icons.Default.Edit, contentDescription = "Editar")
-                        }
-
-                        // Botón Eliminar
-                        IconButton(onClick = { viewModel.eliminarJugador(jugador) }) {
-                            Icon(Icons.Default.Delete, contentDescription = "Eliminar")
-                        }
-                    }
-                }
-            }
+            Text(if (jugadorId == -1) "Registrar" else "Guardar cambios")
         }
     }
 }
