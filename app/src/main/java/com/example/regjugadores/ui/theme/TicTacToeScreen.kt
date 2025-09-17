@@ -2,86 +2,115 @@ package com.example.regjugadores.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.launch
 
 @Composable
 fun TicTacToeScreen(
     jugador1: String,
     jugador2: String,
+    jugador1Id: Int,
+    jugador2Id: Int,
+    partidaViewModel: PartidaViewModel,
     onBack: () -> Unit
 ) {
     var board by remember { mutableStateOf(List(9) { "" }) }
-    var currentPlayer by remember { mutableStateOf(jugador1) }
+    var currentPlayer by remember { mutableStateOf("X") }
     var winner by remember { mutableStateOf<String?>(null) }
-    var empate by remember { mutableStateOf(false) }
+    var gameFinished by remember { mutableStateOf(false) }
+
+    val scope = rememberCoroutineScope()
 
     fun checkWinner(): String? {
-        val winningPositions = listOf(
-            listOf(0, 1, 2), listOf(3, 4, 5), listOf(6, 7, 8), // filas
-            listOf(0, 3, 6), listOf(1, 4, 7), listOf(2, 5, 8), // columnas
-            listOf(0, 4, 8), listOf(2, 4, 6)                   // diagonales
+        val winPatterns = listOf(
+            listOf(0, 1, 2), listOf(3, 4, 5), listOf(6, 7, 8),
+            listOf(0, 3, 6), listOf(1, 4, 7), listOf(2, 5, 8),
+            listOf(0, 4, 8), listOf(2, 4, 6)
         )
-        for (pos in winningPositions) {
-            if (board[pos[0]].isNotEmpty() &&
-                board[pos[0]] == board[pos[1]] &&
-                board[pos[1]] == board[pos[2]]
-            ) {
-                return board[pos[0]]
+        for (pattern in winPatterns) {
+            val (a, b, c) = pattern
+            if (board[a].isNotEmpty() && board[a] == board[b] && board[a] == board[c]) {
+                return board[a]
             }
         }
         return null
     }
 
-    Column(
-        modifier = Modifier.fillMaxSize().padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text("Tic Tac Toe", fontSize = 28.sp, modifier = Modifier.padding(16.dp))
+    fun isBoardFull(): Boolean = board.all { it.isNotEmpty() }
 
-        when {
-            winner != null -> Text("Ganador: $winner 🎉", fontSize = 20.sp, color = Color.Green)
-            empate -> Text("¡Empate! 🤝", fontSize = 20.sp, color = Color.Blue)
-            else -> Text("Turno de: $currentPlayer", fontSize = 20.sp)
+    fun handleMove(index: Int) {
+        if (board[index].isEmpty() && !gameFinished) {
+            board = board.toMutableList().apply { this[index] = currentPlayer }
+            winner = checkWinner()
+
+            if (winner != null) {
+                // ✅ Guardar ganador
+                scope.launch {
+                    partidaViewModel.registrarPartida(
+                        jugador1Id = jugador1Id,
+                        jugador2Id = jugador2Id,
+                        ganadorId = if (winner == "X") jugador1Id else jugador2Id
+                    )
+                }
+                gameFinished = true
+            } else if (isBoardFull()) {
+                // ✅ Guardar empate
+                scope.launch {
+                    partidaViewModel.registrarPartida(
+                        jugador1Id = jugador1Id,
+                        jugador2Id = jugador2Id,
+                        ganadorId = null
+                    )
+                }
+                gameFinished = true
+            }
+
+            currentPlayer = if (currentPlayer == "X") "O" else "X"
         }
+    }
 
-        Spacer(Modifier.height(24.dp))
+    // --- UI ---
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text("Jugador X: $jugador1")
+        Text("Jugador O: $jugador2")
 
-        // ✅ Tablero centrado
-        Column(
-            modifier = Modifier.weight(1f), // Ocupa el espacio disponible
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            for (row in 0..2) {
+        Column {
+            for (i in 0..2) {
                 Row {
-                    for (col in 0..2) {
-                        val index = row * 3 + col
+                    for (j in 0..2) {
+                        val index = i * 3 + j
                         Box(
                             modifier = Modifier
                                 .size(100.dp)
                                 .padding(4.dp)
-                                .background(Color.LightGray)
-                                .clickable(enabled = board[index].isEmpty() && winner == null && !empate) {
-                                    board = board.toMutableList().also {
-                                        it[index] = if (currentPlayer == jugador1) "X" else "O"
-                                    }
-
-                                    val posibleGanador = checkWinner()
-                                    if (posibleGanador != null) {
-                                        winner = if (posibleGanador == "X") jugador1 else jugador2
-                                    } else if (board.none { it.isEmpty() }) {
-                                        empate = true
-                                    } else {
-                                        currentPlayer = if (currentPlayer == jugador1) jugador2 else jugador1
-                                    }
-                                },
+                                .background(MaterialTheme.colorScheme.secondaryContainer)
+                                .clickable { handleMove(index) },
                             contentAlignment = Alignment.Center
                         ) {
                             Text(board[index], fontSize = 32.sp)
@@ -91,25 +120,18 @@ fun TicTacToeScreen(
             }
         }
 
-        // ✅ Botón Reiniciar encima del de Volver
-        Button(
-            onClick = {
-                board = List(9) { "" }
-                currentPlayer = jugador1
-                winner = null
-                empate = false
+        Text(
+            when {
+                winner != null -> "🏆 Ganador: ${if (winner == "X") jugador1 else jugador2}"
+                gameFinished -> "🤝 Empate"
+                else -> "Turno: $currentPlayer"
             },
-            modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
-        ) {
-            Text("Reiniciar")
-        }
+            style = MaterialTheme.typography.titleMedium
+        )
 
-        // ✅ Botón Volver al final de la pantalla
-        Button(
-            onClick = { onBack() },
-            modifier = Modifier.fillMaxWidth()
-        ) {
+        Button(onClick = onBack, modifier = Modifier.fillMaxWidth()) {
             Text("Volver")
         }
     }
 }
+
