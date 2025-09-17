@@ -12,8 +12,11 @@ sealed class Screen(val route: String) {
 
     object Seleccion : Screen("seleccion_jugadores")
 
-    object Juego : Screen("tic_tac_toe/{jugador1}/{jugador2}") {
-        fun crearRuta(j1: String, j2: String) = "tic_tac_toe/$j1/$j2"
+    // 📌 Ahora pasamos también los IDs
+    object Juego : Screen("tic_tac_toe/{jugador1Id}/{jugador1}/{jugador2Id}/{jugador2}") {
+        fun crearRuta(j1Id: Int, j1: String, j2Id: Int, j2: String): String {
+            return "tic_tac_toe/$j1Id/$j1/$j2Id/$j2"
+        }
     }
 
     object Partidas : Screen("lista_partidas")
