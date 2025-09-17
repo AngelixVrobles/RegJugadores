@@ -8,8 +8,10 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.regjugadores.data.local.JugadorDatabase
 import com.example.regjugadores.data.repository.JugadorRepository
+import com.example.regjugadores.data.repository.PartidaRepository
 import com.example.regjugadores.navigation.AppNavHost
 import com.example.regjugadores.ui.JugadorViewModel
+import com.example.regjugadores.ui.PartidaViewModel
 import com.example.regjugadores.ui.theme.RegJugadoresTheme
 
 class MainActivity : ComponentActivity() {
@@ -18,6 +20,7 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             RegJugadoresTheme {
+                // ✅ JugadorViewModel
                 val jugadorViewModel: JugadorViewModel = viewModel(
                     factory = object : ViewModelProvider.Factory {
                         override fun <T : ViewModel> create(modelClass: Class<T>): T {
@@ -28,7 +31,22 @@ class MainActivity : ComponentActivity() {
                     }
                 )
 
-                AppNavHost(viewModel = jugadorViewModel)
+                // ✅ PartidaViewModel
+                val partidaViewModel: PartidaViewModel = viewModel(
+                    factory = object : ViewModelProvider.Factory {
+                        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                            val dao = JugadorDatabase.getDatabase(application).partidaDao()
+                            val repository = PartidaRepository(dao)
+                            return PartidaViewModel(repository) as T
+                        }
+                    }
+                )
+
+                // ✅ Pasamos ambos ViewModels al NavHost
+                AppNavHost(
+                    jugadorViewModel = jugadorViewModel,
+                    partidaViewModel = partidaViewModel
+                )
             }
         }
     }
