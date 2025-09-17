@@ -2,43 +2,35 @@ package com.example.regjugadores.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.LiveData
 import com.example.regjugadores.data.local.Jugador
 import com.example.regjugadores.data.repository.JugadorRepository
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class JugadorViewModel(private val repository: JugadorRepository) : ViewModel() {
 
-    private val _jugadores = MutableLiveData<List<Jugador>>()
-    val jugadores: LiveData<List<Jugador>> = _jugadores
+    val jugadores: StateFlow<List<Jugador>> = repository.obtenerTodos()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     private var jugadorEnEdicion: Jugador? = null
 
-    init {
-        cargarJugadores()
-    }
-
     fun registrarJugador(nombre: String, partidas: Int) {
         viewModelScope.launch {
-            val listaActual = repository.obtenerTodos()
-
-            // 👉 Bloquear duplicados (si no estamos editando)
-            if (jugadorEnEdicion == null && listaActual.any { it.nombres.equals(nombre, ignoreCase = true) }) {
-                return@launch // 🚫 No insertamos duplicados
-            }
+            val listaActual = jugadores.value
+            if (jugadorEnEdicion == null && listaActual.any { it.nombreJugador.equals(nombre, ignoreCase = true) }) return@launch
 
             if (jugadorEnEdicion == null) {
-                // 👉 Nuevo jugador
-                repository.insertar(Jugador(nombres = nombre, partidas = partidas))
+                repository.insertar(Jugador(nombreJugador = nombre, partidasJugadas = partidas))
             } else {
-                // 👉 Editar jugador existente
-                val actualizado = jugadorEnEdicion!!.copy(nombres = nombre, partidas = partidas)
-                repository.insertar(actualizado)
+                val actualizado = jugadorEnEdicion!!.copy(
+                    nombreJugador = nombre,
+                    partidasJugadas = partidas
+                )
+                repository.editar(actualizado)
                 jugadorEnEdicion = null
             }
-
-            _jugadores.value = repository.obtenerTodos()
         }
     }
 
@@ -49,13 +41,6 @@ class JugadorViewModel(private val repository: JugadorRepository) : ViewModel() 
     fun eliminarJugador(jugador: Jugador) {
         viewModelScope.launch {
             repository.eliminar(jugador)
-            _jugadores.value = repository.obtenerTodos()
-        }
-    }
-
-    fun cargarJugadores() {
-        viewModelScope.launch {
-            _jugadores.value = repository.obtenerTodos()
         }
     }
 
