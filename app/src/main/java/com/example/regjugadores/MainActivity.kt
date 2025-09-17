@@ -20,7 +20,6 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             RegJugadoresTheme {
-                // ✅ JugadorViewModel
                 val jugadorViewModel: JugadorViewModel = viewModel(
                     factory = object : ViewModelProvider.Factory {
                         override fun <T : ViewModel> create(modelClass: Class<T>): T {
@@ -31,7 +30,6 @@ class MainActivity : ComponentActivity() {
                     }
                 )
 
-                // ✅ PartidaViewModel
                 val partidaViewModel: PartidaViewModel = viewModel(
                     factory = object : ViewModelProvider.Factory {
                         override fun <T : ViewModel> create(modelClass: Class<T>): T {
@@ -42,7 +40,7 @@ class MainActivity : ComponentActivity() {
                     }
                 )
 
-                // ✅ Pasamos ambos ViewModels al NavHost
+                // ✅ Ahora con los dos ViewModels
                 AppNavHost(
                     jugadorViewModel = jugadorViewModel,
                     partidaViewModel = partidaViewModel
