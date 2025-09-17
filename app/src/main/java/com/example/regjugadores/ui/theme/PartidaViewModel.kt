@@ -41,7 +41,7 @@ class PartidaViewModel(private val repository: PartidaRepository) : ViewModel() 
                 esFinalizada = true
             )
             repository.insertar(partida)
-            cargarPartidas() // ✅ Refrescar historial
+            cargarPartidas() // 🔄 refresca el historial
         }
     }
 
