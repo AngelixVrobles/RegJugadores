@@ -1,24 +1,40 @@
 package com.example.regjugadores.ui
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
-import com.example.regjugadores.data.local.Jugador
+import androidx.compose.ui.unit.dp
 
 @Composable
 fun ListaJugadoresScreen(
     viewModel: JugadorViewModel,
     onAgregarClick: () -> Unit,
     onEditarClick: (Int) -> Unit,
-    onJuegoClick: () -> Unit
+    onJuegoClick: () -> Unit,
+    onHistorialClick: () -> Unit // nuevo parámetro
 ) {
     val jugadores by viewModel.jugadores.collectAsState()
 
@@ -39,7 +55,7 @@ fun ListaJugadoresScreen(
                 .padding(16.dp),
             horizontalAlignment = Alignment.Start
         ) {
-            // 📌 Título centrado
+            // Título centrado
             Text(
                 text = "Jugadores Registrados",
                 style = MaterialTheme.typography.titleLarge,
@@ -49,18 +65,28 @@ fun ListaJugadoresScreen(
                 textAlign = TextAlign.Center
             )
 
-            // 📌 Botón para ir al juego
+            // Botón para ir al juego
             Button(
                 onClick = { onJuegoClick() },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 16.dp)
+                    .padding(bottom = 8.dp)
             ) {
                 Text("Ir al juego de TicTacToe 🎮")
             }
 
+            // Botón para ver historial de partidas
+            Button(
+                onClick = { onHistorialClick() },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 16.dp)
+            ) {
+                Text("Ver historial de partidas 📜")
+            }
+
             if (jugadores.isEmpty()) {
-                // 📌 Texto centrado cuando no hay jugadores
+                // Texto centrado cuando no hay jugadores
                 Box(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
