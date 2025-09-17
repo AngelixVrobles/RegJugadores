@@ -6,14 +6,19 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.example.regjugadores.ui.ListaJugadoresScreen
-import com.example.regjugadores.ui.RegistroJugadorScreen
 import com.example.regjugadores.ui.JugadorViewModel
+import com.example.regjugadores.ui.ListaJugadoresScreen
+import com.example.regjugadores.ui.ListaPartidasScreen
+import com.example.regjugadores.ui.PartidaViewModel
+import com.example.regjugadores.ui.RegistroJugadorScreen
 import com.example.regjugadores.ui.SeleccionJugadoresScreen
 import com.example.regjugadores.ui.TicTacToeScreen
 
 @Composable
-fun AppNavHost(viewModel: JugadorViewModel) {
+fun AppNavHost(
+    jugadorViewModel: JugadorViewModel,
+    partidaViewModel: PartidaViewModel
+) {
     val navController = rememberNavController()
 
     NavHost(
@@ -23,16 +28,17 @@ fun AppNavHost(viewModel: JugadorViewModel) {
         // 📌 Lista de jugadores
         composable(Screen.Lista.route) {
             ListaJugadoresScreen(
-                viewModel = viewModel,
+                viewModel = jugadorViewModel,
                 onAgregarClick = { navController.navigate(Screen.Registro.crearRuta()) },
-                onEditarClick = { jugadorId: Int -> // 👈 tipo explícito
+                onEditarClick = { jugadorId: Int ->
                     navController.navigate(Screen.Registro.crearRuta(jugadorId))
                 },
-                onJuegoClick = { navController.navigate(Screen.Seleccion.route) } // 👈 navega a selección
+                onJuegoClick = { navController.navigate(Screen.Seleccion.route) },
+                onHistorialClick = { navController.navigate(Screen.Partidas.route) }
             )
         }
 
-        // 📌 Registro / edición
+        // 📌 Registro / edición de jugadores
         composable(
             route = Screen.Registro.route,
             arguments = listOf(navArgument("jugadorId") {
@@ -42,7 +48,7 @@ fun AppNavHost(viewModel: JugadorViewModel) {
         ) { backStackEntry ->
             val jugadorId: Int = backStackEntry.arguments?.getInt("jugadorId") ?: -1
             RegistroJugadorScreen(
-                viewModel = viewModel,
+                viewModel = jugadorViewModel,
                 jugadorId = jugadorId,
                 onGuardar = { navController.popBackStack() }
             )
@@ -51,8 +57,8 @@ fun AppNavHost(viewModel: JugadorViewModel) {
         // 📌 Selección de jugadores antes de jugar
         composable(Screen.Seleccion.route) {
             SeleccionJugadoresScreen(
-                viewModel = viewModel,
-                onJugarClick = { j1: String, j2: String -> // 👈 tipos explícitos
+                viewModel = jugadorViewModel,
+                onJugarClick = { j1: String, j2: String ->
                     navController.navigate(Screen.Juego.crearRuta(j1, j2))
                 },
                 onBack = { navController.popBackStack() }
@@ -74,6 +80,16 @@ fun AppNavHost(viewModel: JugadorViewModel) {
                 jugador1 = j1,
                 jugador2 = j2,
                 onBack = { navController.popBackStack() }
+            )
+        }
+
+        // 📌 Historial de partidas
+        composable(Screen.Partidas.route) {
+            ListaPartidasScreen(
+                viewModel = partidaViewModel,
+                onAgregarClick = {
+                    // Aquí pones la lógica si quieres agregar partida manual
+                }
             )
         }
     }
