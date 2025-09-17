@@ -5,9 +5,14 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 
-@Database(entities = [Jugador::class], version = 1, exportSchema = false)
+@Database(
+    entities = [Jugador::class, Partida::class],
+    version = 2,
+    exportSchema = false
+)
 abstract class JugadorDatabase : RoomDatabase() {
     abstract fun jugadorDao(): JugadorDao
+    abstract fun partidaDao(): PartidaDao
 
     companion object {
         @Volatile
@@ -19,7 +24,9 @@ abstract class JugadorDatabase : RoomDatabase() {
                     context.applicationContext,
                     JugadorDatabase::class.java,
                     "jugador_db"
-                ).fallbackToDestructiveMigration().build()
+                )
+                    .fallbackToDestructiveMigration()
+                    .build()
                 INSTANCE = instance
                 instance
             }
