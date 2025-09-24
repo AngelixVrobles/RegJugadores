@@ -15,6 +15,7 @@ import androidx.compose.runtime.getValue
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.compose.material.icons.filled.Star
 
 @Composable
 fun CustomBottomBar(navController: NavHostController) {
@@ -22,7 +23,8 @@ fun CustomBottomBar(navController: NavHostController) {
         Screen.Lista,     // 🏠 Jugadores Registrados
         Screen.Registro,  // ➕ Registrar jugador
         Screen.Seleccion, // 🎮 Selección de jugadores
-        Screen.Partidas   // 📜 Historial de partidas
+        Screen.Partidas,  // 📜 Historial de partidas
+        Screen.Logros     // ⭐ Logros (nuevo)
     )
 
     NavigationBar {
@@ -35,35 +37,22 @@ fun CustomBottomBar(navController: NavHostController) {
             NavigationBarItem(
                 icon = {
                     when (screen) {
-                        is Screen.Lista -> Icon(
-                            Icons.Filled.Home,
-                            contentDescription = "Jugadores"
-                        )
-
-                        is Screen.Registro -> Icon(
-                            Icons.Filled.PersonAdd,
-                            contentDescription = "Registrar"
-                        )
-
-                        is Screen.Seleccion -> Icon(
-                            Icons.Filled.SportsEsports,
-                            contentDescription = "Jugar"
-                        )
-
-                        is Screen.Partidas -> Icon(
-                            Icons.Filled.History,
-                            contentDescription = "Historial"
-                        )
-                        // 👇 Para evitar error de when exhaustivo
-                        else -> Icon(
-                            Icons.Filled.Home,
-                            contentDescription = "Default"
-                        )
+                        is Screen.Lista -> Icon(Icons.Filled.Home, contentDescription = "Jugadores")
+                        is Screen.Registro -> Icon(Icons.Filled.PersonAdd, contentDescription = "Registrar")
+                        is Screen.Seleccion -> Icon(Icons.Filled.SportsEsports, contentDescription = "Jugar")
+                        is Screen.Partidas -> Icon(Icons.Filled.History, contentDescription = "Historial")
+                        is Screen.Logros -> Icon(Icons.Filled.Star, contentDescription = "Logros") // 👈 nuevo
+                        else -> {}
                     }
                 },
                 selected = selected,
                 onClick = {
-                    navController.navigate(screen.route) {
+                    navController.navigate(
+                        when (screen) {
+                            is Screen.Logros -> Screen.Logros.crearRuta(1) // ⚠️ de momento abre logros de jugador 1
+                            else -> screen.route
+                        }
+                    ) {
                         popUpTo(navController.graph.startDestinationId) { saveState = true }
                         launchSingleTop = true
                         restoreState = true
@@ -79,3 +68,4 @@ fun CustomBottomBar(navController: NavHostController) {
         }
     }
 }
+
