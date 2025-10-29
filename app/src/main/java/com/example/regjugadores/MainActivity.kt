@@ -5,15 +5,19 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.navigation.compose.rememberNavController
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.compose.rememberNavController
+import androidx.room.Room
 import com.example.regjugadores.data.local.JugadorDatabase
+import com.example.regjugadores.data.remote.JugadorApi
 import com.example.regjugadores.data.repository.JugadorRepository
-import com.example.regjugadores.data.repository.PartidaRepository
 import com.example.regjugadores.data.repository.LogroRepository
+import com.example.regjugadores.data.repository.PartidaRepository
 import com.example.regjugadores.navigation.AppNavHost
 import com.example.regjugadores.ui.*
 import com.example.regjugadores.ui.theme.RegJugadoresTheme
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 
 class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
@@ -25,13 +29,29 @@ class MainActivity : ComponentActivity() {
             RegJugadoresTheme {
                 val navController = rememberNavController()
 
-                // ✅ Inicializamos la base de datos y repositorios
-                val db = JugadorDatabase.getDatabase(applicationContext)
-                val jugadorRepo = JugadorRepository(db.jugadorDao())
+                // ✅ Inicializa Room
+                val db = Room.databaseBuilder(
+                    applicationContext,
+                    JugadorDatabase::class.java,
+                    "jugador_db"
+                )
+                    .fallbackToDestructiveMigration()
+                    .build()
+
+                // ✅ Inicializa Retrofit
+                val retrofit = Retrofit.Builder()
+                    .baseUrl("https://gestionhuacalesapi.azurewebsites.net/api/")
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .build()
+
+                val jugadorApi = retrofit.create(JugadorApi::class.java)
+
+                // ✅ Repositorios
+                val jugadorRepo = JugadorRepository(db.jugadorDao(), jugadorApi)
                 val partidaRepo = PartidaRepository(db.partidaDao())
                 val logroRepo = LogroRepository(db.logroDao())
 
-                // ✅ ViewModels con Factory
+                // ✅ ViewModels
                 val jugadorViewModel: JugadorViewModel =
                     viewModel(factory = JugadorViewModelFactory(jugadorRepo))
                 val partidaViewModel: PartidaViewModel =
@@ -39,7 +59,7 @@ class MainActivity : ComponentActivity() {
                 val logroViewModel: LogroViewModel =
                     viewModel(factory = LogroViewModelFactory(logroRepo))
 
-                // ✅ Pasamos todo al NavHost
+                // ✅ Navegación
                 AppNavHost(
                     navController = navController,
                     jugadorViewModel = jugadorViewModel,
