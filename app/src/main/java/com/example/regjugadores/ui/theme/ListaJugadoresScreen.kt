@@ -10,7 +10,6 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.SportsEsports
-import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -29,12 +28,17 @@ fun ListaJugadoresScreen(
     onAgregarClick: () -> Unit,
     onEditarClick: (Int) -> Unit,
     onJuegoClick: () -> Unit,
-    onHistorialClick: () -> Unit,
-    onLogrosClick: (Int) -> Unit // 👈 nuevo callback
+    onHistorialClick: () -> Unit
 ) {
     val jugadores by viewModel.jugadores.collectAsState()
 
-    Scaffold { padding ->
+    Scaffold(
+        floatingActionButton = {
+            FloatingActionButton(onClick = onAgregarClick) {
+                Icon(Icons.Default.Edit, contentDescription = "Agregar Jugador")
+            }
+        }
+    ) { padding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -123,7 +127,7 @@ fun ListaJugadoresScreen(
                                     color = MaterialTheme.colorScheme.onSurface
                                 )
                                 Text(
-                                    "${jugador.partidasJugadas} partidas",
+                                    jugador.email,
                                     style = MaterialTheme.typography.bodyMedium,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
@@ -142,13 +146,6 @@ fun ListaJugadoresScreen(
                                         Icons.Default.Delete,
                                         contentDescription = "Eliminar",
                                         tint = MaterialTheme.colorScheme.error
-                                    )
-                                }
-                                IconButton(onClick = { onLogrosClick(jugador.jugadorId) }) {
-                                    Icon(
-                                        Icons.Default.Star,
-                                        contentDescription = "Logros",
-                                        tint = MaterialTheme.colorScheme.tertiary
                                     )
                                 }
                             }
