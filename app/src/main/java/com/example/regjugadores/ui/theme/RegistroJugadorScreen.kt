@@ -9,7 +9,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.Alignment
-import com.example.regjugadores.data.local.Jugador
 
 @Composable
 fun RegistroJugadorScreen(
@@ -18,7 +17,7 @@ fun RegistroJugadorScreen(
     onGuardar: () -> Unit
 ) {
     var nombre by remember { mutableStateOf("") }
-    var partidas by remember { mutableStateOf("") }
+    var email by remember { mutableStateOf("") }
 
     // ✅ Si es edición, cargamos datos del jugador
     LaunchedEffect(jugadorId) {
@@ -26,7 +25,7 @@ fun RegistroJugadorScreen(
             val jugador = viewModel.jugadores.value.find { it.jugadorId == jugadorId }
             jugador?.let {
                 nombre = it.nombreJugador
-                partidas = it.partidasJugadas.toString()
+                email = it.email
                 viewModel.setJugadorEditando(it)
             }
         }
@@ -55,10 +54,10 @@ fun RegistroJugadorScreen(
         )
 
         OutlinedTextField(
-            value = partidas,
-            onValueChange = { partidas = it },
-            label = { Text("Partidas jugadas") },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+            value = email,
+            onValueChange = { email = it },
+            label = { Text("Correo electrónico") },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 16.dp)
@@ -66,9 +65,9 @@ fun RegistroJugadorScreen(
 
         Button(
             onClick = {
-                if (nombre.isNotBlank() && partidas.isNotEmpty()) {
-                    viewModel.registrarJugador(nombre.trim(), partidas.toInt())
-                    onGuardar() // 🔙 volver a la lista
+                if (nombre.isNotBlank() && email.isNotBlank()) {
+                    viewModel.registrarJugador(nombre.trim(), email.trim())
+                    onGuardar()
                 }
             },
             modifier = Modifier.fillMaxWidth()
