@@ -26,19 +26,22 @@ fun AppNavHost(
             startDestination = Screen.Lista.route,
             modifier = Modifier.padding(innerPadding)
         ) {
+            // 🧩 Lista de jugadores
             composable(Screen.Lista.route) {
                 ListaJugadoresScreen(
                     viewModel = jugadorViewModel,
                     onAgregarClick = { navController.navigate(Screen.Registro.crearRuta()) },
                     onEditarClick = { id -> navController.navigate(Screen.Registro.crearRuta(id)) },
                     onJuegoClick = { navController.navigate(Screen.Seleccion.route) },
-                    onHistorialClick = { navController.navigate(Screen.Partidas.route) },
-                    onLogrosClick = { id -> navController.navigate(Screen.Logros.crearRuta(id)) }
+                    onHistorialClick = { navController.navigate(Screen.Partidas.route) }
+                    // ❌ se eliminó el onLogrosClick (no existe en esa pantalla)
                 )
             }
 
+            // 🧩 Registro de jugador
             composable(Screen.Registro.route) { backStackEntry ->
-                val jugadorId = backStackEntry.arguments?.getString("jugadorId")?.toIntOrNull() ?: -1
+                val jugadorId =
+                    backStackEntry.arguments?.getString("jugadorId")?.toIntOrNull() ?: -1
                 RegistroJugadorScreen(
                     viewModel = jugadorViewModel,
                     jugadorId = jugadorId,
@@ -46,6 +49,7 @@ fun AppNavHost(
                 )
             }
 
+            // 🧩 Selección de jugadores
             composable(Screen.Seleccion.route) {
                 SeleccionJugadoresScreen(
                     viewModel = jugadorViewModel,
@@ -56,11 +60,13 @@ fun AppNavHost(
                 )
             }
 
+            // 🧩 Juego (Tic Tac Toe)
             composable(Screen.Juego.route) { backStackEntry ->
                 val j1Id = backStackEntry.arguments?.getString("jugador1Id")?.toIntOrNull() ?: -1
                 val j1 = backStackEntry.arguments?.getString("jugador1") ?: ""
                 val j2Id = backStackEntry.arguments?.getString("jugador2Id")?.toIntOrNull() ?: -1
                 val j2 = backStackEntry.arguments?.getString("jugador2") ?: ""
+
                 TicTacToeScreen(
                     jugador1Id = j1Id,
                     jugador1 = j1,
@@ -71,6 +77,7 @@ fun AppNavHost(
                 )
             }
 
+            // 🧩 Lista de partidas
             composable(Screen.Partidas.route) {
                 ListaPartidasScreen(
                     viewModel = partidaViewModel,
@@ -78,20 +85,22 @@ fun AppNavHost(
                 )
             }
 
-            // ✅ Logros con botón FAB para agregar
-            composable(Screen.Logros.route) { backStackEntry ->
-                val jugadorId = backStackEntry.arguments?.getString("jugadorId")?.toIntOrNull() ?: -1
+            // 🧩 Lista general de logros (gestión completa)
+            composable(Screen.Logros.route) {
                 ListaLogrosScreen(
                     viewModel = logroViewModel,
-                    jugadorId = jugadorId,
+                    jugadorId = -1, // 👈 general, no jugador específico
                     onBack = { navController.popBackStack() },
-                    onAgregarClick = { navController.navigate(Screen.RegistroLogro.crearRuta(jugadorId)) }
+                    onAgregarClick = {
+                        navController.navigate("registro_logro/-1")
+                    }
                 )
             }
 
-            // ✅ Registro de logros
-            composable(Screen.RegistroLogro.route) { backStackEntry ->
-                val jugadorId = backStackEntry.arguments?.getString("jugadorId")?.toIntOrNull() ?: -1
+            // 🧩 Registro de un logro
+            composable("registro_logro/{jugadorId}") { backStackEntry ->
+                val jugadorId =
+                    backStackEntry.arguments?.getString("jugadorId")?.toIntOrNull() ?: -1
                 RegistroLogroScreen(
                     viewModel = logroViewModel,
                     jugadorId = jugadorId,
