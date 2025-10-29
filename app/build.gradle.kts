@@ -63,6 +63,10 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
 
     // ✅ Jetpack Compose
+    // ✅ Retrofit y Gson Converter
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.material3)
