@@ -16,17 +16,17 @@ class JugadorViewModel(private val repository: JugadorRepository) : ViewModel() 
 
     private var jugadorEnEdicion: Jugador? = null
 
-    fun registrarJugador(nombre: String, partidas: Int) {
+    fun registrarJugador(nombre: String, email: String) {
         viewModelScope.launch {
             val listaActual = jugadores.value
             if (jugadorEnEdicion == null && listaActual.any { it.nombreJugador.equals(nombre, ignoreCase = true) }) return@launch
 
             if (jugadorEnEdicion == null) {
-                repository.insertar(Jugador(nombreJugador = nombre, partidasJugadas = partidas))
+                repository.insertar(Jugador(nombreJugador = nombre, email = email))
             } else {
                 val actualizado = jugadorEnEdicion!!.copy(
                     nombreJugador = nombre,
-                    partidasJugadas = partidas
+                    email = email
                 )
                 repository.editar(actualizado)
                 jugadorEnEdicion = null
