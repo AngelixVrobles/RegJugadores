@@ -1,4 +1,4 @@
-# RegJugadores 🎮
+# RegJugadores
 
 > App **Android nativa** para registrar jugadores, partidas y logros, con un juego de **Tic-Tac-Toe** integrado. Construida con Jetpack Compose, Room y arquitectura MVVM.
 
@@ -12,11 +12,11 @@
 
 ---
 
-## 📌 Qué es
+## Qué es
 
 App Android que gestiona **jugadores**, **partidas** y **logros** con persistencia local, e incluye un **Tic-Tac-Toe** jugable que registra los resultados. Es un proyecto para practicar el stack moderno de Android (Compose + Room + MVVM) con una arquitectura limpia por capas.
 
-## ✨ Funcionalidades
+## Funcionalidades
 
 - **Registro y edición de jugadores** (con validación de nombres duplicados).
 - **Registro de partidas** con jugadores asociados (relación muchos-a-muchos).
@@ -25,7 +25,7 @@ App Android que gestiona **jugadores**, **partidas** y **logros** con persistenc
 - **Persistencia local** con Room (sobrevive al cierre de la app).
 - **Navegación** entre pantallas con barra inferior personalizada.
 
-## 🏗️ Arquitectura
+## Arquitectura
 
 Sigue el patrón **MVVM** recomendado por Google, con separación por capas:
 
@@ -40,7 +40,7 @@ data/
 
 **Flujo de datos reactivo:** `Room (Flow)` → `Repository` → `ViewModel (StateFlow)` → `UI (Compose)`. La UI se recompone automáticamente al cambiar los datos.
 
-## 🛠️ Stack tecnológico
+## Stack tecnológico
 
 | Área | Tecnología |
 |------|-----------|
@@ -52,23 +52,17 @@ data/
 | Navegación | Navigation Compose |
 | Ciclo de vida | Lifecycle / ViewModel |
 
-## 🚀 Cómo ejecutar
+## Cómo ejecutar
 
 ```bash
 # Requisitos: Android Studio (Hedgehog+) y un emulador o dispositivo (Android 8.0 / API 26+)
 1. Clona el repositorio.
 2. Ábrelo en Android Studio y deja que sincronice Gradle.
-3. Pulsa ▶️ Run sobre un emulador o dispositivo.
+3. Pulsa Run sobre un emulador o dispositivo.
 ```
-
-## 📸 Capturas
-
-> _Capturas de la app en ejecución — pendientes de agregar (registro de jugadores, partida, Tic-Tac-Toe, logros)._
 
 ---
 
-### 👤 Autor
+### Autor
 
-**Angelix Vásquez** · Angelixvrobles1234@outlook.com · [LinkedIn](https://linkedin.com/in/TU-USUARIO)
-
-<!-- 👆 Actualiza el enlace de LinkedIn y agrega capturas en /docs -->
+**Angelix Vásquez** · Angelixvrobles1234@outlook.com · [GitHub](https://github.com/AngelixVrobles)
