@@ -8,11 +8,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.regjugadores"
+    namespace = "com.angelixvasquez.regjugadores"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.example.regjugadores"
+        applicationId = "com.angelixvasquez.regjugadores"
         minSdk = 26
         targetSdk = 34
         versionCode = 1
@@ -74,6 +74,7 @@ dependencies {
 
     // ✅ Tests
     testImplementation(libs.junit)
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
