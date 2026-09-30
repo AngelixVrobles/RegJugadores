@@ -65,4 +65,4 @@ data/
 
 ### Autor
 
-**Angelix Vásquez** · Angelixvrobles1234@outlook.com · [GitHub](https://github.com/AngelixVrobles)
+**Angelix Vásquez** · [GitHub](https://github.com/AngelixVrobles)
